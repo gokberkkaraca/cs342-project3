@@ -6,14 +6,15 @@ int* dynamicMemoryPointers[100];
 int count = 0;
 
 void useStackMemory(int n) {
-  int arr[100];
-  if (n > 0) {
-    useStackMemory(n-1);
-  }
-  else {
+  int arr[1000];
+
+  if (n == 0){
     printf("End of recursive calls, type \"OK\" to release stack memory\n");
     char input[20];
     scanf("%s", input);
+  }
+  else if (n > 0) {
+    useStackMemory(n-1);
   }
 }
 
@@ -43,10 +44,10 @@ int main() {
 
   while (1) {
     if (strcmp(input, "1") == 0) {
-      useStackMemory(100);
+      useStackMemory(2000);
     }
     else if (strcmp(input, "2") == 0) {
-      allocateHeapMemory(100);
+      allocateHeapMemory(10000);
     }
     else if (strcmp(input, "3") == 0) {
       deallocateHeapMemory();
