@@ -3,6 +3,7 @@
 #include <linux/init.h>
 #include <linux/sched.h>
 #include <linux/pid.h>
+#include <linux/mm.h>
 
 static int processid;
 static int is_stack(struct vm_area_struct *vma);
@@ -27,12 +28,12 @@ int init_module(void)
   vma = mm->mmap;
   print_memory_area(mm, vma);
 
-	return 0;
+  return 0;
 }
 
 void cleanup_module(void)
 {
-	printk(KERN_INFO "Module removed\n");
+  printk(KERN_INFO "Module removed\n");
 }
 
 void print_memory_area(struct mm_struct *mm, struct vm_area_struct *vma) {
@@ -52,13 +53,19 @@ void print_memory_area(struct mm_struct *mm, struct vm_area_struct *vma) {
     }
   }
 
+  printk("Main Arguments start: %lx\t end: %lx\t size: %lx\n",
+    mm->arg_start, mm->arg_end, mm->arg_end - mm->arg_start);
+  printk("Environment Variables start: %lx\t end: %lx\t size: %lx\n",
+    mm->env_start, mm->env_end, mm->env_end - mm->env_start);
+  printk("number of frames used by the process (rss): %lx\t", get_mm_rss(mm));
+  printk("Total virtual memory used by the process (total_vm): %lx\t", mm->total_vm);
 }
 
 /* This method is taken from linux kernel source code */
 static int is_stack(struct vm_area_struct *vma)
 {
-	return vma->vm_start <= vma->vm_mm->start_stack &&
-		vma->vm_end >= vma->vm_mm->start_stack;
+  return vma->vm_start <= vma->vm_mm->start_stack &&
+    vma->vm_end >= vma->vm_mm->start_stack;
 }
 
 static int is_heap(struct vm_area_struct *vma)
