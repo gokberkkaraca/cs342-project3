@@ -6,7 +6,7 @@ sudo insmod $1.ko processid=$2
 sudo rmmod $1
 
 #output the log file
-tail -100 /var/log/kern.log
+sudo dmesg -c
 
 #clean files
 rm .$1*
