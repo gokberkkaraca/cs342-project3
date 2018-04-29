@@ -4,6 +4,7 @@
 make
 sudo insmod $1.ko processid=$2
 sudo rmmod $1
+clear
 
 #output the log file
 sudo dmesg -c

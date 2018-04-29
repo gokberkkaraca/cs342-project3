@@ -1,9 +1,10 @@
 #include <linux/module.h>
 #include <linux/kernel.h>
-#include <linux/init.h>
 #include <linux/sched.h>
 #include <linux/pid.h>
 #include <linux/mm.h>
+
+#define SIZE_CONVERTER (4)
 
 static int processid;
 static int is_stack(struct vm_area_struct *vma);
@@ -18,8 +19,8 @@ int init_module(void)
   struct mm_struct *mm;
   struct vm_area_struct *vma;
 
-  printk(KERN_INFO "Module added\n");
-  printk("Looking for process ID: %d\n", processid);
+  printk("Module added\n");
+  printk("Looking for process ID: %d\n\n", processid);
 
   pid_struct = find_get_pid(processid);
   task = NULL;
@@ -40,27 +41,27 @@ void cleanup_module(void)
 
 void print_memory_area(struct mm_struct *mm, struct vm_area_struct *vma) {
 
-  printk("Code start: %lx\t end: %lx\t size: %lu\n", mm->start_code,
+  printk("Code:\t start: %#018lx\t end: %#018lx\t size: %lu\n", mm->start_code,
     mm->end_code, mm->end_code - mm->start_code);
-  printk("Data start: %lx\t end: %lx\t size: %lu\n",
+  printk("Data:\t start: %#018lx\t end: %#018lx\t size: %lu\n",
     mm->start_data, mm->end_data, mm->end_data - mm->start_data);
 
   for (; vma != NULL; vma = vma->vm_next) {
     if (is_stack(vma)) {
-      printk("Stack: start: %lx\t end: %lx\t size: %lu\n",
+      printk("Stack:\t start: %#018lx\t end: %#018lx\t size: %lu\n\n",
        vma->vm_start, vma->vm_end, vma->vm_end - vma->vm_start);
     }else if(is_heap(vma)){
-      printk("Heap: start: %lx\t end: %lx\t size: %lu\n",
+      printk("Heap:\t start: %#018lx\t end: %#018lx\t size: %lu\n",
        vma->vm_start, vma->vm_end, vma->vm_end - vma->vm_start);
     }
   }
 
-  printk("Main Arguments start: %lx\t end: %lx\t size: %lu\n",
+  printk("Main Arguments:\t\t start: %#018lx\t end: %#018lx\t size: %lu\n",
     mm->arg_start, mm->arg_end, mm->arg_end - mm->arg_start);
-  printk("Environment Variables start: %lx\t end: %lx\t size: %lu\n",
+  printk("Environment Variables:\t start: %#018lx\t end: %#018lx\t size: %lu\n",
     mm->env_start, mm->env_end, mm->env_end - mm->env_start);
-  printk("number of frames used by the process (rss): %lx\t", get_mm_rss(mm));
-  printk("Total virtual memory used by the process (total_vm): %lx\t", mm->total_vm);
+  printk("Number of frames used by the process (rss): %lu\t", get_mm_rss(mm) * SIZE_CONVERTER);
+  printk("Total virtual memory used by the process (total_vm): %lu\t\n\n", mm->total_vm * SIZE_CONVERTER);
 }
 
 void print_page_tables(struct mm_struct *mm) {
@@ -70,7 +71,7 @@ void print_page_tables(struct mm_struct *mm) {
     unsigned long address;
     address = pgd[i].pgd;
     if ( address != 0) {
-      printk("\nEntry %d", i);
+      printk("Entry %d", i);
       printk("PGD: %#018lx\t", address);
       printk("P: %lu\t", (address << 63) >> 63);
       printk("R/W: %lu\t", (address << 62) >> 63);
@@ -79,7 +80,7 @@ void print_page_tables(struct mm_struct *mm) {
       printk("PCD: %lu\t", (address << 59) >> 63);
       printk("A: %lu\t", (address << 58) >> 63);
       printk("PS: %lu\t", (address << 56) >> 63);
-      printk("Physical adress: %#08lx\t", (address << 28) >> 40);
+      printk("Physical adress: %#08lx\n\n", (address << 28) >> 40);
     }
   }
 }
@@ -91,6 +92,7 @@ static int is_stack(struct vm_area_struct *vma)
     vma->vm_end >= vma->vm_mm->start_stack;
 }
 
+/* This method is taken from linux kernel source code */
 static int is_heap(struct vm_area_struct *vma)
 {
   return vma->vm_start <= vma->vm_mm->brk &&
