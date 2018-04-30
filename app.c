@@ -7,9 +7,10 @@ int count = 0;
 
 void useStackMemory(int n) {
   if (n == 0){
-    printf("End of recursive calls, type \"OK\" to release stack memory\n");
+    printf("End of recursive calls, type \"OK\" to exit\n");
     char input[20];
     scanf("%s", input);
+    exit(0);
   }
   else if (n > 0) {
     useStackMemory(n-1);
@@ -42,7 +43,11 @@ int main() {
 
   while (1) {
     if (strcmp(input, "1") == 0) {
-      useStackMemory(2000);
+      int numOfRecursions;
+      numOfRecursions = 0;
+      printf("Enter number of recursions: ");
+      scanf("%d", &numOfRecursions);
+      useStackMemory(numOfRecursions);
     }
     else if (strcmp(input, "2") == 0) {
       allocateHeapMemory(10000);
