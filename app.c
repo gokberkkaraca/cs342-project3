@@ -6,8 +6,6 @@ int* dynamicMemoryPointers[100];
 int count = 0;
 
 void useStackMemory(int n) {
-  int arr[1000];
-
   if (n == 0){
     printf("End of recursive calls, type \"OK\" to release stack memory\n");
     char input[20];
