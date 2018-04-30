@@ -70,7 +70,7 @@ void print_page_tables(struct mm_struct *mm) {
   for (i = 0; i < 512; i++) {
     unsigned long address;
     address = pgd[i].pgd;
-    if ((address & 1) == 1) {
+    if ((address & 0x00000001) == 1) {
       printk("Entry %d", i);
       printk("PGD: %#018lx\t", address);
       printk("P: %lu\t", (address << 63) >> 63);
